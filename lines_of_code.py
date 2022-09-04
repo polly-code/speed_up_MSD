@@ -131,3 +131,27 @@ plt.show()
 # r=np.array([x,y]).T
 #%timeit msd_fft(r)
 #%timeit straight_msd(x,y)
+
+import time
+
+ns = [10, 100, 200, 500, 1000, 2000, 5000]
+slows = []
+fasts = []
+for i in ns:
+    x, y = random_walk_2d(n=i)
+    r = np.array([x, y]).T
+    slow = time.time()
+    straight_msd(x, y)
+    slows.append(time.time() - slow)
+    [i for i in range(10000)]
+    fast = time.time()
+    msd_fft(r)
+    fasts.append(time.time() - fast)
+
+plt.figure(figsize=(7,5))
+plt.plot(ns, slows, label="slow")
+plt.plot(ns, fasts, label="fast")
+plt.xlabel("Length of trajectory, points")
+plt.ylabel("Time, s")
+plt.legend()
+plt.savefig("benchmark.png", dpi=300, bbox_inches='tight')
