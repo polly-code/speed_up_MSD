@@ -8,20 +8,38 @@ plt.ylabel("Distance, m")
 plt.savefig("straight_motion.png", dpi=300)
 plt.show()
 
-plt.figure(figsize=(7,5))
-plt.plot(np.arange(1,100), (np.arange(1,100)*10)**2)
-plt.xlabel("Time, s")
-plt.ylabel(r"MSD, $m^2$")
-plt.savefig("straight_motion_msd.png", dpi=300)
-plt.show()
+def straight_msd(x, y):
+    msd = np.zeros((len(x), 2))
+    for i in range(len(x)):
+        for j in range(i + 1, len(x)):
+            msd[j - i, 0] += (x[i] - x[j]) ** 2 + (y[i] - y[j]) ** 2
+            msd[j - i, 1] += 1
+    return np.divide(
+        msd[:, 0],
+        msd[:, 1],
+        out=np.zeros_like(msd[:, 0]),
+        where=msd[:, 1] != 0,
+    )
 
-plt.figure(figsize=(7,5))
-plt.plot(np.arange(1,100), (np.arange(1,100)*10)**2)
-plt.xlabel("Time, s")
-plt.ylabel(r"MSD, $m^2$")
-plt.xscale('log')
-plt.yscale('log')
-plt.savefig("straight_motion_msd_log.png", dpi=300)
+fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+axs[0].plot(np.arange(1, 100), straight_msd(np.arange(100) * 10, np.zeros(100))[1:])
+axs[0].set_xlabel("Time, s")
+axs[0].set_ylabel(r"MSD, $m^2$")
+
+axs[1].plot(
+    np.arange(1, 100),
+    straight_msd(np.arange(100) * 10, np.zeros(100))[1:],
+    label="simulation",
+)
+axs[1].plot(
+    np.arange(1, 100), (np.arange(1, 100) * 10) ** 2, "--", label=r"theory $\alpha=2$"
+)
+axs[1].set_xlabel("Time, s")
+axs[1].set_ylabel(r"MSD, $m^2$")
+axs[1].set_xscale("log")
+axs[1].set_yscale("log")
+axs[1].legend()
+plt.savefig("straight_motion_msd+log.png", dpi=300)
 plt.show()
 
 def random_walk_2d(n=100):
@@ -41,7 +59,10 @@ def straight_msd(x, y):
             msd[j - i, 0] += (x[i] - x[j]) ** 2 + (y[i] - y[j]) ** 2
             msd[j - i, 1] += 1
     return np.divide(
-        msd[:, 0], msd[:, 1], out=np.zeros_like(msd[:, 0]), where=msd[:, 1] != 0
+        msd[:, 0], 
+        msd[:, 1], 
+        out=np.zeros_like(msd[:, 0]), 
+        where=msd[:, 1] != 0,
     )
             
             
